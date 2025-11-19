@@ -1,14 +1,27 @@
 #include <format>
+#include <print>
 
 #include "ppm.h"
-PPMFile::PPMFile(std::filesystem::path path, int width, int height)
-    : m_Path(path), m_FileStream(m_Path, std::ios::out | std::ios::trunc)
-    , m_Width(width), m_Height(height)
+PPMFile::PPMFile(const char *path, int width, int height)
+    : m_Path(path), m_FileStream(std::fopen(path, "w")), m_Width(width), m_Height(height)
 {
-    m_FileStream << "P6\n" << std::format("{} {}\n", m_Width, m_Height) << "255\n";
-    m_FileStream = std::fstream(m_Path, std::ios::app | std::ios::out | std::ios::binary);
+    std::print(m_FileStream, "P6\n");
+    std::print(m_FileStream, "{} {}\n", m_Width, m_Height);
+    std::print(m_FileStream, "255\n");
+
+    std::freopen(m_Path, "ab", m_FileStream);
+
+    s_Buffer.reserve(m_Width * m_Height);
 }
-void PPMFile::WritePixel(const Color& color)
+
+PPMFile::~PPMFile()
 {
-    m_FileStream << color.r << color.g << color.b;
+    std::fwrite(s_Buffer.data(), sizeof(unsigned char), s_Buffer.size() * 3, m_FileStream);
+    std::fclose(m_FileStream);
+    s_Buffer.clear();
+}
+
+void PPMFile::WritePixel(const Color &color)
+{
+    s_Buffer.push_back(color);
 }

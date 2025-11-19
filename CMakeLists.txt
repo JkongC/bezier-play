@@ -14,8 +14,6 @@ target_sources(bezier-play PRIVATE src/main.cpp
     src/BezierPoint.cpp
     src/BezierCurve.h
     src/BezierCurve.cpp
-    src/Thread/ThreadPool.h
-    src/Thread/ThreadPool.cpp
 )
 target_include_directories(bezier-play PRIVATE src)
 

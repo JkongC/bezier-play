@@ -1,8 +1,8 @@
 #ifndef PP_PICFORMAT_H_
 #define PP_PICFORMAT_H_
 
-#include <filesystem>
-#include <fstream>
+#include <cstdio>
+#include <vector>
 
 struct Color
 {
@@ -21,10 +21,16 @@ struct ColorDefinition
 class PPMFile
 {
 public:
-    PPMFile(std::filesystem::path path, int width, int height);
-    ~PPMFile() = default;
+    PPMFile(const char* path, int width, int height);
+    ~PPMFile();
 
     void WritePixel(const Color& color);
+
+    inline bool IsValid() const
+    {
+        return m_FileStream != nullptr;
+    }
+
     inline int GetWidth() const
     {
         return m_Width;
@@ -49,8 +55,10 @@ public:
     }
 
 private:
-    std::filesystem::path m_Path;
-    std::fstream m_FileStream;
+    const char* m_Path;
+    std::FILE* m_FileStream;
+    static inline std::vector<Color> s_Buffer;
+
     int m_Width;
     int m_Height;
 
